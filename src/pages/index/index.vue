@@ -50,7 +50,7 @@
        
       </view>
        <!-- 回到顶部 -->
-      <view class="goTop icon-top" @click="goTop"></view>
+      <view class="goTop icon-top" @click="goTop" v-show="heights>0"></view>
 	</view>
 </template>
 
@@ -63,7 +63,8 @@
         h:'auto',
         swiperlist:[],//轮播图
         navslist:[],// 导航
-        floorslist:[]// 楼层数据
+        floorslist:[],// 楼层数据
+        heights:0 // 默认屏幕蜷曲高度
 			}
 		},
 		onLoad() {
@@ -75,6 +76,13 @@
       this.getfloors()
 		},
 		methods: {
+       // 点击按钮 返回顶部
+      goTop(){
+        uni.pageScrollTo({
+          scrollTop:0, // 返回到顶部
+          duration:100 // 100 毫秒 的动画时间
+        })
+      },
       indexFather(h){
          console.log('index首页执行了',h)
          this.h=h
@@ -117,18 +125,14 @@
         })
         console.log('楼层数据',res)
         this.floorslist=res.message
-      },
-      // 点击按钮 返回顶部
-      goTop(){
-        
       }
 
     },
     components:{
       search
     },
+    // 下拉刷新 
     async onPullDownRefresh(){
-      console.log('首页下拉啦~~')
       // 刷新 页面 就是从头请求数据 来一遍
       // 查看network请求 
       await this.getSwiper() //假如 3秒
@@ -137,6 +141,11 @@
       // 等待请求完毕 应该 立刻关闭下拉效果
       uni.stopPullDownRefresh()
 
+    },
+    // 页面 蜷曲高度 监听
+    onPageScroll(obj){
+      // console.log(obj.scrollTop); 屏幕蜷曲高度
+      this.heights = obj.scrollTop
     }
 	}
 </script>

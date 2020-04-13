@@ -69,7 +69,15 @@
 
 <script>
   export default {
+    onLoad(e){
+      console.log(e);
+      
+    },
+    data(){
+      return {
 
+      }
+    },
     methods: {
       goDetail () {
         uni.navigateTo({

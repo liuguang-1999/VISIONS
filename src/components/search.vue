@@ -3,7 +3,9 @@
   <div class="search" :class="{active: isfocus}">
     <!-- 搜索框 -->
     <div class="input-wrap" @click="goSearch">
-      <input type="text" placeholder="请输入搜索商品">
+      <!-- 监听文本框 输入关键字 -->
+      <!-- 绑定输入值 -->
+      <input type="text" placeholder="请输入搜索商品" v-model="keyword" @input="query" @confirm="goList" />
       <span class="cancle" @click.stop="goCancel">取消</span>
     </div>
     <!-- 搜索结果 -->
@@ -20,24 +22,7 @@
       </div>
       <!-- 结果 -->
       <scroll-view scroll-y class="result">
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
+        <navigator url="/pages/goods/index" v-for="item in list" :key="item.goods_id">{{ item.goods_name }}</navigator>
       </scroll-view>
     </div>
   </div>
@@ -48,10 +33,32 @@
     data () {
       return {
         isfocus: false,
-        placeholder: ''
+        placeholder: '',
+        keyword:'' ,// 搜索文本框的 输入值
+        list:[] // 搜索结果
       }
     },
     methods: {
+      // 文本框火车 跳转到商品页面 带上参数传过去
+      goList(){
+        // 跳转列表 并带上参数
+        if (this.keyword !== '') {
+        uni.navigateTo({
+          url: '/pages/list/index?query=' + this.keyword,
+        });
+       }
+      },
+      // 文本框 输入值触发事件 接收一个参数
+      async query(){
+        // console.log(this.keyword);
+           let ser =await this.http({
+          url:"/api/public/v1/goods/qsearch",
+          data:{
+            query:this.keyword
+          }
+        })
+        this.list = ser.message
+      },
       goSearch (ev) {
         // 获取焦点 isfocus true 加上 active
         this.isfocus=true;

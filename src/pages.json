@@ -27,10 +27,17 @@
 			}
 		},
     {
-      "path": "pages/goods/index"
+      "path": "pages/goods/index",
+      "style":{
+        "navigationBarTitleText":"优购商城物品详情"
+      }
     },
     {
-      "path": "pages/list/index"
+      "path": "pages/list/index",
+      "style":{ // 局部配置
+        "navigationBarTitleText": "商品列表",
+        "onReachBottomDistance":30 // 距离底部30PX 执行上拉加载方法
+      }
     },
     {
       "path": "pages/order/index"

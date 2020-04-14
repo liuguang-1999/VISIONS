@@ -8,80 +8,73 @@
     </view>
     <!-- 商品列表 -->
     <view class="goods">
-      <view class="item" @click="goDetail">
+      <!-- 一个商品 -->
+      <view class="item" @click="goDetail(item.goods_id)" v-for="item in goodslist" :key="item.goods_id">
         <!-- 商品图片 -->
-        <image class="pic" src="http://static.botue.com/ugo/uploads/goods_1.jpg"></image>
+        <!-- <image class="pic" :src="item.goods_small_logo"></image> -->
+        <image class="pic" :src="item.goods_small_logo" alt="" />
         <!-- 商品信息 -->
         <view class="meta">
-          <view class="name">【海外购自营】黎珐(ReFa) MTG日本 CARAT铂金微电流瘦脸瘦身提拉紧致V脸美容仪 【保税仓发货】</view>
+          <view class="name">{{item.goods_name}}</view>
           <view class="price">
-            <text>￥</text>1399<text>.00</text>
-          </view>
-        </view>
-      </view>
-      <view class="item" @click="goDetail">
-        <!-- 商品图片 -->
-        <image class="pic" src="http://static.botue.com/ugo/uploads/goods_2.jpg"></image>
-        <!-- 商品信息 -->
-        <view class="meta">
-          <view class="name">卡奇莱德汽车车载空气净化器负离子除甲醛PM2.5除烟异味车用氧吧双涡轮出风（红色）</view>
-          <view class="price">
-            <text>￥</text>168<text>.00</text>
-          </view>
-        </view>
-      </view>
-      <view class="item" @click="goDetail">
-        <!-- 商品图片 -->
-        <image class="pic" src="http://static.botue.com/ugo/uploads/goods_3.jpg"></image>
-        <!-- 商品信息 -->
-        <view class="meta">
-          <view class="name">沿途（yantu）车载充电器车充一拖二usb转接口手机智能头多功能汽车点烟器</view>
-          <view class="price">
-            <text>￥</text>168<text>.00</text>
-          </view>
-        </view>
-      </view>
-      <view class="item" @click="goDetail">
-        <!-- 商品图片 -->
-        <image class="pic" src="http://static.botue.com/ugo/uploads/goods_4.jpg"></image>
-        <!-- 商品信息 -->
-        <view class="meta">
-          <view class="name">车载冰箱7.5L 冷暖两用汽车冰箱半导体12V迷你电冰箱升级款</view>
-          <view class="price">
-            <text>￥</text>168<text>.00</text>
-          </view>
-        </view>
-      </view>
-      <view class="item" @click="goDetail">
-        <!-- 商品图片 -->
-        <image class="pic" src="http://static.botue.com/ugo/uploads/goods_5.jpg"></image>
-        <!-- 商品信息 -->
-        <view class="meta">
-          <view class="name">神行者电子狗 神行者L70电子狗测速 测速雷达 流动测速 多种警示路段提醒</view>
-          <view class="price">
-            <text>￥</text>168<text>.00</text>
+            <text>￥</text>{{item.goods_price}}<text>.00</text>
           </view>
         </view>
       </view>
     </view>
+   <view v-show="shows" class="botm">已经到底啦 没有数据了亲</view>
   </view>
 </template>
 
 <script>
+/**
+ *  
+ */
   export default {
+    // 上拉加载函数方法
+    onReachBottom(){
+      console.log("上拉触发了");
+      if (this.total == this.goodslist.length) {
+        this.shows = true
+        return
+      }
+      this.marpases.pagenum++
+      this.getgoodslist()
+    },
     onLoad(e){
-      console.log(e);
-      
+      // console.log(e); // e=> {query:"大米"}
+      this.marpases.query = e.query
+      this.getgoodslist()
     },
     data(){
       return {
-
+        marpases:{
+          query:null ,// 查询的关键字
+          pagenum:1 ,// 当前页码 默认显示第一页
+          pagesize:20 // 每次刷新 显示20条数据 
+         },
+          goodslist:[] ,// 储存 关键字商品、 商品列表 数组
+          total:0 ,// 商品总条数
+          shows:false
       }
     },
     methods: {
-      goDetail () {
+      // 获取关键字 搜索到的 信息
+      async getgoodslist(){
+        let data = this.marpases
+        let ser = await this.http({
+          url:'/api/public/v1/goods/search',
+          data
+        })
+        console.log(ser);
+        
+        this.goodslist.push(...ser.message.goods) // 关键字商品、 
+        this.total = ser.message.total // 总条数 61
+      },
+      // 跳转到 详情页面
+      goDetail (id) {
         uni.navigateTo({
-          url: '/pages/goods/index'
+          url: '/pages/goods/index?id=' + id
         })
       }
     }
@@ -89,6 +82,11 @@
 </script>
 
 <style scoped lang="scss">
+  .botm {
+    height: 30rpx;
+    margin-left: 9%;
+    font-size: 57rpx;
+  }
   .list{
     padding-top: 100rpx;
   }

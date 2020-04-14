@@ -9,9 +9,9 @@ Vue.prototype.http=async function(options){
   // 发送之前loading
   uni.showLoading({
     title: '加载中',
+    mask:true
   })
   let baseURL="https://www.uinav.com"
-
   let res=await uni.request({
     url: baseURL+options.url,
     data:options.data,

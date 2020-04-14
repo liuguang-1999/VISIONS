@@ -7,7 +7,7 @@
           <swiper indicator-dots :autoplay="true">
              
              <swiper-item v-for="item in swiperlist" :key="item.goods_id">
-                <navigator url="/pages/goods/index">
+                <navigator :url="'/pages/goods/index?id='+item.goods_id">
                     <image :src="item.image_src"></image>
                 </navigator>
              </swiper-item>
@@ -17,6 +17,7 @@
       <!-- 导航菜单宫格 -->
       <view class="navs">
            <navigator 
+            open-type="switchTab"
             v-for="item in navslist"
             :key="item.navigator_url"
             url="/pages/category/index">

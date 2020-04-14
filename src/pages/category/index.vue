@@ -57,8 +57,6 @@
           let ser=await this.http({
             url:"/api/public/v1/categories"
           })
-          console.log(ser);
-          
           this.allcategory = ser.message
       },
       // 点击左侧 获取 当前分类的 索引  修改 右侧显示对用的数据

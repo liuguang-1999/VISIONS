@@ -10,18 +10,14 @@
     </div>
     <!-- 搜索结果 -->
     <div class="search-content">
-      <div class="title">搜索历史<span class="clear"></span></div>
+      <!-- 点击 × 清空搜索历史 -->
+      <div class="title">搜索历史<span class="clear" @click="remove"></span></div>
       <div class="history">
-        <navigator url="/pages/list/index">小米</navigator>
-        <navigator url="/pages/list/index">智能电视</navigator>
-        <navigator url="/pages/list/index">小米空气净化器</navigator>
-        <navigator url="/pages/list/index">西门子洗碗机</navigator>
-        <navigator url="/pages/list/index">华为手机</navigator>
-        <navigator url="/pages/list/index">苹果</navigator>
-        <navigator url="/pages/list/index">锤子</navigator>
+        <navigator url="/pages/list/index" v-for="item in history" :key="item">{{ item }}</navigator>
       </div>
       <!-- 结果 -->
-      <scroll-view scroll-y class="result">
+      <!-- 有了搜索结果 才有必要显示 这个列表 -->
+      <scroll-view scroll-y class="result" v-if="list.length>0">
         <navigator url="/pages/goods/index" v-for="item in list" :key="item.goods_id">{{ item.goods_name }}</navigator>
       </scroll-view>
     </div>
@@ -35,12 +31,23 @@
         isfocus: false,
         placeholder: '',
         keyword:'' ,// 搜索文本框的 输入值
-        list:[] // 搜索结果
+        list:[] ,// 搜索结果
+        history:wx.getStorageSync("histry")||[] // 搜索记录储存
       }
     },
     methods: {
+      // 点击清空搜索记录
+      remove(){
+        this.history = []
+         uni.setStorageSync("histry", this.history);
+      },
       // 文本框火车 跳转到商品页面 带上参数传过去
       goList(){
+        this.history.push(this.keyword)
+        // console.log(this.history);
+        // 去除重复 添加到本地缓存
+        this.history = [...new Set(this.history)]
+        uni.setStorageSync("histry", this.history);
         // 跳转列表 并带上参数
         if (this.keyword !== '') {
         uni.navigateTo({
@@ -80,6 +87,7 @@
 
         // 显示tabBar
         uni.showTabBar();
+        this.keyword = ''
       }
     }
   }

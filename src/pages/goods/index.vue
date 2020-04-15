@@ -21,7 +21,7 @@
     <view class="action">
       <button open-type="contact" class="icon-handset">联系客服</button>
       <text class="cart icon-cart" @click="goCart">购物车</text>
-      <text class="add">加入购物车</text>
+      <text class="add" @click="addcarte">加入购物车</text>
       <text class="buy" @click="createOrder">立即购买</text>
     </view>
   </view>
@@ -38,10 +38,39 @@
     data(){
       return {
         id:null ,// 商品列表传过来的 id
-        goods:null // 储存 请求回来的数据 
+        goods:null ,// 储存 请求回来的数据 
+        // 本地里面有数据  就取出来 从尾部添加 一条
+        // 假如是个 空数组 直接添加数据
+        carts: uni.getStorageSync('carts') || [] // 购物车 数组储存商品
       }
     },
     methods: {
+        // 加入 购物车  功能  当前商品 存入到本地
+        addcarte(){
+         // 需要用到的 数据解构赋值 出来 不需需要用到全部数据 
+         // 商品id 价格 购买数量 名字 图片
+         let {goods_id,goods_price,goods_name,goods_small_logo}=this.goods
+         // 判断 carts购物车 是否有当前商品 有就数量加一 没有就尾部追加
+         // 判断商品 id  是否 和当前商品id 一样
+         let index = this.carts.findIndex(item =>  item.goods_id===this.goods.goods_id)
+         if (index === -1) {
+            this.carts.push({
+           goods_id,
+           goods_price,
+           goods_name,
+           goods_small_logo,
+           goods_numbar:1 ,// 默认 1条数据
+           goods_cheacked:true // 购物车 商品选中或未被选中 处理参数
+         })
+         uni.showToast({
+           title: '加入购物车成功'
+         })
+         }else{
+           this.carts[index].goods_numbar++
+         }
+        // 存入本地操作 
+         uni.setStorageSync('carts', this.carts);
+        },
         // 通过 id 获取对应数据
         async getdatas(){
           let ser =await this.http({

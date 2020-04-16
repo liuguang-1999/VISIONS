@@ -26,6 +26,7 @@
             <view class="name">{{item.goods_name}}</view>
             <view class="price">
               <text>￥</text>{{ item.goods_price }}<text>.00</text>
+            <view @click="remov(index)"> 删除 </view>
             </view>
             <!-- 加减 -->
             <view class="amount">
@@ -101,6 +102,11 @@
         }
       },
       methods:{
+        // 点击删除按钮 删除商品
+        remov(index){
+          this.carts.splice(index,1)
+          uni.setStorageSync('carts',this.carts)
+        },
         // 点击添加 收货地址 按钮添加 收货地址
         getAddress(){
           uni.chooseAddress({

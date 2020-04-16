@@ -16,7 +16,7 @@
         <!-- 店铺名称 -->
         <view class="shopname">优购生活馆</view>
         <!-- 循环购物车 生成商品列表 -->
-        <view class="goods" v-for="item in carts" :key="item.goods_id">
+        <view class="goods" v-for="(item,index) in carts" :key="item.goods_id">
           <!-- 商品图片 -->
           <image class="pic" :src="item.goods_small_logo"></image>
           <!-- 商品信息 -->
@@ -27,14 +27,15 @@
             </view>
             <!-- 加减 -->
             <view class="amount">
-              <text class="reduce">-</text>
-              <input type="number" :value="item.goods_numbar" class="number">
-              <text class="plus">+</text>
+              <text class="reduce" @click="reduceNum(index)">-</text>
+              <!-- 监听 值改变事件 修改需要购买的数量 -->
+              <input type="number" :value="item.goods_numbar" class="number" @input="setvalue(index,$event)">
+              <text class="plus" @click="addnumber(index)">+</text>
             </view>
           </view>
           <!-- 选框 -->
           <view class="checkbox">
-            <icon type="success" size="20" :color="item.goods_cheacked ? '#ea4451' :'#ccc'"></icon>
+            <icon @click="togglo(index)" type="success" size="20" :color="item.goods_cheacked ? '#ea4451' :'#ccc'"></icon>
           </view>
         </view>
       </view>
@@ -42,7 +43,8 @@
     <!-- 其它 -->
     <view class="extra">
       <label class="checkall">
-        <icon type="success" color="#ccc" size="20"></icon>
+        <icon @click="setAllChecked" type="success" :color="allchecked? '#ea4451' : '#ccc' " size="20"></icon>
+        <!-- <icon type="success" color="#ccc" size="20"></icon> -->
         全选
       </label>
       <view class="total">
@@ -50,19 +52,97 @@
       </view>
       <view class="pay">结算(3)</view>
     </view>
-  </view>
+  </view> 
 </template>
 
 <script>
   export default {
+     computed:{
+       // 计算购物车 商品总价
+        totals(){
+          
+        },
+      // 计算属性 一般用作于 计算总价 计算总数 计算是否全选 等等
+      // 计算属性 只要值变化 就会实时计算属性值的变化 后的数据
+      checkdegoods(){ // 计算所有选中的 商品
+          // 过滤 数组中的每一项 复选框 组成一个新数组
+          let newgoods = this.carts.filter((item) =>{
+            return item.goods_cheacked === true
+          })
+          // 过滤后的 结果返回
+          return newgoods 
+      },
+      allchecked(){ 
+        return this.carts.length === this.checkdegoods.length
+      }
+    }, 
+    onShow(){
+      this.carts = uni.getStorageSync('carts') || []
+    },
       onLoad(){},
       data(){
         return {
-          carts: uni.getStorageSync('carts') || [], // 购物车数据
+          carts: [], // 购物车数据
           address:null // 收货地址
         }
       },
-      methods:{}
+      methods:{
+        // 点击全选按钮 实现全选 & 全不选 功能 
+        setAllChecked(){
+          if (this.allchecked) {
+             this.carts.forEach(item=>{
+            item.goods_cheacked = false
+          })
+          } else {
+            this.carts.forEach(item=>{
+            item.goods_cheacked = true
+          })
+        }
+          uni.setStorageSync('carts',this.carts)
+        },
+        // √ 复选框 选中 和 未选中
+        togglo(index){
+          // √ 选中了 就取反 未选中 未选中就取反
+          this.carts[index].goods_cheacked = !this.carts[index].goods_cheacked
+          uni.setStorageSync('carts',this.carts)
+        },
+        // 点击 + 号商品数量加1
+        addnumber(index){
+          // 当前要购买的商品 不能一直购买 需要限制一个购买数量
+          let num = this.carts[index].goods_numbar
+          if (num >= 10) return
+          // 通过索引 找到需要更新的商品 对商品的数量进行 + 1
+          this.carts[index].goods_numbar++
+          // 购物车数据发生了改变  本地数据也需要写入更新 
+          uni.setStorageSync('carts',this.carts)
+        },
+        // 点击 - 号商品数量加1
+        reduceNum(index){
+          console.log("我被点击了");
+          
+           // 当前要减去的商品 不能一直减 需要限制一个减去数量
+          let num = this.carts[index].goods_numbar
+          if (num <= 1) return
+          // 通过索引 找到需要更新的商品 对商品的数量进行 - 1
+          this.carts[index].goods_numbar--
+          // 购物车数据发生了改变  本地数据也需要写入更新 
+          uni.setStorageSync('carts',this.carts)
+        },
+        // 文本框 值改变事件 文本框输入值之后回车 触发该事件
+        setvalue(index,e){
+          // 获取到的 数字 是个字符串类型 这个类型 不正确 ×1 就可以进行隐式转换 成数字类型
+          let a = e.detail.value * 1
+          // 存入 本地之前 需要进行判断 一下 最多商品和最少商品
+          if (a<=1) {
+             a = 1
+          } 
+           if(a>=10) {
+            a = 10
+          }
+            this.carts[index].goods_numbar = a
+            uni.setStorageSync('carts',this.carts)
+        },
+      }
   }
 </script>
 

@@ -89,7 +89,7 @@
       methods:{
         // 点击全选按钮 实现全选 & 全不选 功能 
         setAllChecked(){
-          if (this.allchecked) {
+          if (this.allchecked) { 
              this.carts.forEach(item=>{
             item.goods_cheacked = false
           })

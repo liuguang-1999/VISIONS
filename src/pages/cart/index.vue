@@ -1,19 +1,21 @@
 <template>
   <view class="wrapper">
     <!-- 收货信息 -->
-    <view class="shipment">
+    <view class="shipment" v-if="address">
       <view class="dt">收货人: </view>
       <view class="dd meta">
-        <text class="name">刘德华</text>
-        <text class="phone">13535337057</text>
+        <text class="name">{{ address.userName }}</text>
+        <text class="phone">{{ address.telNumber }}</text>
       </view>
       <view class="dt">收货地址:</view>
-      <view class="dd">广东省广州市天河区一珠吉</view>
+      <view class="dd">{{detailAddress}}</view>
     </view>
+    <!-- 添加收货地址 按钮 -->
+    <button v-else type="primary" @click="getAddress">添加收货地址</button>
     <!-- 购物车 -->
     <view class="carts">
       <view class="item">
-        <!-- 店铺名称 -->
+        <!-- 店铺名称 --> 
         <view class="shopname">优购生活馆</view>
         <!-- 循环购物车 生成商品列表 -->
         <view class="goods" v-for="(item,index) in carts" :key="item.goods_id">
@@ -48,9 +50,9 @@
         全选
       </label>
       <view class="total">
-        合计: <text>￥</text><label>14110</label><text>.00</text>
+        合计: <text>￥</text><label>{{ totals }}</label><text>.00</text>
       </view>
-      <view class="pay">结算(3)</view>
+      <view class="pay">结算({{ checkdegoods.length }})</view>
     </view>
   </view> 
 </template>
@@ -58,9 +60,21 @@
 <script>
   export default {
      computed:{
+         // 拼接 收货地址
+       detailAddress(){
+        if (this.address) {
+           return this.address.provinceName+this.address.cityName+this.address.countyName+this.address.detailInfo
+        }
+       },  
        // 计算购物车 商品总价
         totals(){
-          
+          let sums = 0
+          // 遍历 每一项为 true (被选中) 的商品 进行计算
+          this.checkdegoods.forEach(item => {
+            // 购物车商品总价 => 商品价格 * 总数 相加 = 总价
+             sums += item.goods_numbar * item.goods_price
+          })
+          return sums
         },
       // 计算属性 一般用作于 计算总价 计算总数 计算是否全选 等等
       // 计算属性 只要值变化 就会实时计算属性值的变化 后的数据
@@ -87,6 +101,16 @@
         }
       },
       methods:{
+        // 点击添加 收货地址 按钮添加 收货地址
+        getAddress(){
+          uni.chooseAddress({
+            // 收货地址 参数 result
+             success:(result)=>{
+              // 收货地址 赋值给数据中的 address
+              this.address = result
+            }
+          }) 
+        },
         // 点击全选按钮 实现全选 & 全不选 功能 
         setAllChecked(){
           if (this.allchecked) { 

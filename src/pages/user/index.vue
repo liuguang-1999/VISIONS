@@ -3,8 +3,10 @@
     <!-- 个人资料 -->
     <view class="profile">
       <view class="meta">
-        <image class="avatar" src="http://static.botue.com/ugo/uploads/monkey.png"></image>
-        <text class="nickname">孙悟空</text>
+        <!-- <image class="avatar" src="http://static.botue.com/ugo/uploads/monkey.png"></image> -->
+        <open-data class="avatar" type="userAvatarUrl"></open-data>
+        <!-- <text class="nickname">孙悟空</text> -->
+        <open-data class="nickname" type="userNickName"></open-data>
       </view>
     </view>
     <!-- 统计 -->
@@ -38,15 +40,32 @@
     </view>
     <!-- 其它 -->
     <view class="extra">
-      <view class="item icon-arrow">联系客服</view>
-      <button class="item icon-arrow">意见反馈</button>
+      <view class="item icon-arrow">
+        <button open-type="contact"> 联系客服 </button>
+      </view>
+       <button open-type="feedback" class="item icon-arrow">意见反馈</button>
     </view>
   </view>
 </template>
 
 <script>
   export default {
-    
+      data(){
+        return {
+
+        }
+      },
+      methdos:{
+
+      },
+      // 监听 小程序 右上角 转发和分享 执行函数
+      onShareAppMessage(){
+        return {
+          title:'我是标题党' ,// 微信的 转发标题
+          path:'/pages/user/index' ,// 别人打开 我的小程序 会第一个进入的页面
+          imageUrl:'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3948863708,1225019901&fm=26&gp=0.jpg'
+        }
+      }
   }
 </script>
 
@@ -70,10 +89,12 @@
     .meta {
 
       .avatar {
+        display: block;
         width: 140rpx;
         height: 140rpx;
-        border-radius: 50%;
+        // border-radius: 50%;
         border: 2rpx solid #fff;
+        margin-left: 85rpx;
       }
 
       .nickname {
@@ -157,10 +178,10 @@
     margin: 0 20rpx;
     background-color: #fff;
     border-radius: 4rpx;
-
+     box-sizing:border-box;
     .item {
       line-height: 1;
-      padding: 25rpx 0 25rpx 20rpx;
+      padding: 15rpx 0 15rpx 20rpx;
       border-bottom: 1rpx solid #eee;
       font-size: 30rpx;
       color: #333;

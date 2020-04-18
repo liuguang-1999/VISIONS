@@ -53,7 +53,7 @@
       <view class="total">
         合计: <text>￥</text><label>{{ totals }}</label><text>.00</text>
       </view>
-      <view class="pay">结算({{ checkdegoods.length }})</view>
+      <view class="pay" @click="createOrder">结算({{ checkdegoods.length }})</view>
     </view>
   </view> 
 </template>
@@ -102,6 +102,34 @@
         }
       },
       methods:{
+        // 点击结算按钮 跳转到 订单页面--- 支付列表
+        createOrder(){
+          // 需要3个条件 去判断
+          // 1、 没有地址 不跳
+          if (!this.address) {
+            uni.showToast({
+              title: '请填写收货地址!'
+            })
+            return
+          }
+          // 2、 没有选中的 商品不跳
+          if (!this.checkdegoods.length >= 1) {
+            uni.showToast({
+              title: '请选择至少一件商品!'
+            })
+            return
+          }
+          // 3、 没有登陆 不跳 
+          // 登陆后 会有一个 token 使用 token 进行判断 没有就是没登陆
+          let token = uni.getStorageSync('token')
+          if (!token) {
+            uni.navigateTo({
+              url: '/pages/auth/index'
+            })
+            return
+          }
+            console.log("全通过了");
+        },
         // 点击删除按钮 删除商品
         remov(index){
           this.carts.splice(index,1)

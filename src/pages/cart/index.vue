@@ -18,29 +18,34 @@
         <!-- 店铺名称 --> 
         <view class="shopname">优购生活馆</view>
         <!-- 循环购物车 生成商品列表 -->
-        <view class="goods" v-for="(item,index) in carts" :key="item.goods_id">
-          <!-- 商品图片 -->
-          <image class="pic" :src="item.goods_small_logo"></image>
-          <!-- 商品信息 -->
-          <view class="meta">
-            <view class="name">{{item.goods_name}}</view>
-            <view class="price">
-              <text>￥</text>{{ item.goods_price }}<text>.00</text>
-            <view @click="remov(index)"> 删除 </view>
-            </view>
-            <!-- 加减 -->
-            <view class="amount">
-              <text class="reduce" @click="reduceNum(index)">-</text>
-              <!-- 监听 值改变事件 修改需要购买的数量 -->
-              <input type="number" :value="item.goods_numbar" class="number" @input="setvalue(index,$event)">
-              <text class="plus" @click="addnumber(index)">+</text>
-            </view>
-          </view>
-          <!-- 选框 -->
-          <view class="checkbox">
-            <icon @click="togglo(index)" type="success" size="20" :color="item.goods_cheacked ? '#ea4451' :'#ccc'"></icon>
-          </view>
-        </view>
+        <uniSwipeAction>
+          <uniSwipeActionItem :options="options" v-for="(item,index) in carts" :key="item.goods_id" @click="remov(index,$event)">
+              <view class="goods">
+                <!-- 商品图片 -->
+                <image class="pic" :src="item.goods_small_logo"></image>
+                <!-- 商品信息 -->
+                <view class="meta">
+                  <view class="name">{{item.goods_name}}</view>
+                  <view class="price">
+                    <text>￥</text>{{ item.goods_price }}<text>.00</text>
+                  <!-- <view @click="remov(index)"> 删除 </view> -->
+                  </view>
+                  <!-- 加减 -->
+                  <view class="amount">
+                    <text class="reduce" @click="reduceNum(index)">-</text>
+                    <!-- 监听 值改变事件 修改需要购买的数量 -->
+                    <input type="number" :value="item.goods_numbar" class="number" @input="setvalue(index,$event)">
+                    <text class="plus" @click="addnumber(index)">+</text>
+                  </view>
+                </view>
+                <!-- 选框 -->
+                <view class="checkbox">
+                  <icon @click="togglo(index)" type="success" size="20" :color="item.goods_cheacked ? '#ea4451' :'#ccc'"></icon>
+                </view>
+              </view>
+            <uniSwipeActionItem>
+        </uniSwipeAction>
+        <!-- 单个商品结尾 -->
       </view>
     </view>
     <!-- 其它 -->
@@ -59,7 +64,13 @@
 </template>
 
 <script>
+  import uniSwipeAction from '@/components/uni-swipe-action/uni-swipe-action.vue'
+  import uniSwipeActionItem from '@/components/uni-swipe-action-item/uni-swipe-action-item.vue'
   export default {
+    components:{
+      uniSwipeAction,
+      uniSwipeActionItem
+    },
      computed:{
          // 拼接 收货地址
        detailAddress(){
@@ -98,7 +109,19 @@
       data(){
         return {
           carts: [], // 购物车数据
-          address:null // 收货地址
+          address:null ,// 收货地址
+          // 购物车删除单个商品 数据
+          options:[{
+            text: '取消',
+                  style: {
+                      backgroundColor: '#007aff'
+                  }
+          },{
+            text: '删除',
+            style: {
+                backgroundColor: '#dd524d'
+            }
+        }]
         }
       },
       methods:{
@@ -131,9 +154,11 @@
             console.log("全通过了");
         },
         // 点击删除按钮 删除商品
-        remov(index){
-          this.carts.splice(index,1)
-          uni.setStorageSync('carts',this.carts)
+        remov(index,e){
+          if (e.content.text == "删除") {
+            this.carts.splice(index,1)
+            uni.setStorageSync('carts',this.carts)
+          }
         },
         // 点击添加 收货地址 按钮添加 收货地址
         getAddress(){
